@@ -2,15 +2,15 @@
 
 Logger::Logger(const string& fileName):_fileName(fileName)
 {
-	_fs.open(_fileName, fstream::in | fstream::out | fstream::app);
+	_fs.open(_fileName, fstream::in | fstream::out | fstream::app); // открывает или создает файл для чтения и записи данных
 
-	if (_fs.is_open())
+	if (_fs.is_open()) // проверка что файл открывается
 		this->_status = true;
 }
 
 Logger::~Logger()
 {
-	_fs.close();
+	_fs.close(); /// закрываем поток
 }
 
 bool Logger::setLog(const string& from, const string& to, const string& messag)
@@ -19,8 +19,10 @@ bool Logger::setLog(const string& from, const string& to, const string& messag)
 
 	if (this->_status == true)
 	{
+		_m.lock();
 		_fs << sendText;
 		_fs << endl;
+		_m.unlock();
 		return true;
 	}
 
@@ -33,11 +35,13 @@ void Logger::getLog()
 
 	if (this->_status == true)
 	{
+		_m.lock();
 		while (!_fs.eof())
 		{
 			_fs >> text;
 			cout << text << endl;
 		}
+		_m.unlock();
 	}
 }
 
